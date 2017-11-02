@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar  3 20:08:42 2017
+
+@author: deaxman
+"""
+
+"""
+Illustrate simple contour plotting, contours on an image with
+a colorbar for the contours, and labelled contours.
+
+See also contour_image.py.
+"""
+#%%
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import numpy as np
+import pandas as pd
+from numpy.linalg import inv
+from numpy.linalg import det
+from scipy.spatial import distance_matrix
+#%%
+def combineRowsCols(M,idxArr):
+    newM=M.copy()
+    newM[idxArr[0],:]=np.mean(M[idxArr,:],axis=0)
+    newM=np.delete(newM,idxArr[1:],axis=0)
+    newM[:,idxArr[0]]=np.mean(newM[:,idxArr],axis=1)
+    newM=np.delete(newM,idxArr[1:],axis=1)
+    return newM
+#%%
+def flatten(l):
+    full=[]
+    for e in l:
+        if type(e) == list:
+            full=full+flatten(e)
+        else:
+            full=full+[e]
+    return full
+
+#%%
+X=np.random.rand(50,2)*10
+distanceMat=np.sqrt(np.sum(X[:,:,np.newaxis]-X[:,:,np.newaxis].T,axis=1)**2)
+level=[]
+idxTrack=[i for i in range(X.shape[0])]
+for i in range(100):
+    setList=[set([i,j]) for i,j in zip(np.where(distanceMat==(distanceMat+((distanceMat.max()+1)*np.eye(distanceMat.shape[0],distanceMat.shape[1]))).min())[0],np.where(distanceMat==(distanceMat+((distanceMat.max()+1)*np.eye(distanceMat.shape[0],distanceMat.shape[1]))).min())[1])]
+    level.append(setList)
+    idxTrack[list(set.union(*setList))[0]]=[idxTrack[i] for i in list(set.union(*setList))]
+    [idxTrack.pop(i) for i in sorted(list(set.union(*setList))[1:],reverse=True)]
+    distanceMat=combineRowsCols(distanceMat,list(set.union(*setList)))
+    if distanceMat.size==1:
+        break
+labels=np.empty((0,1))
+fullX=np.empty((0,2))
+for i,idx in enumerate(idxTrack[0][0][0]):
+   labels=np.concatenate((labels,np.full((len(flatten(idx)),1),i)),axis=0)
+   fullX=np.concatenate((fullX,X[np.array(flatten(idx)),:]),axis=0)
+    
+plt.scatter(fullX[:,0],fullX[:,1],c=labels)        
+

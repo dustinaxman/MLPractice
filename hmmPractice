@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar  3 08:12:10 2017
+
+@author: deaxman
+"""
+
+#%%
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import numpy as np
+import pandas as pd
+from numpy.linalg import inv
+from numpy.linalg import det
+#%%
+S=np.array([1,2,2,4,2,3])
+O=np.array([[0,0],[3,3],[3,4],[7,7],[2,3],[10,10]])
+betaMat=np.array([[0.1,0.7,0.1,0.1],[0,0.8,0.1,0.1],[0.25,0.25,0.25,0.25],[0.1,0.8,0.1,0]])
+paramMean=np.array([[0,0],[3,3],[10,10],[7,6]])
+paramSigma=np.array([[[1,0],[0,1]],[[1,.5],[.5,1]],[[2,0],[0,1]],[[1,.2],[.2,1.5]]])
+paramInvSigma=np.array([inv(i) for i in paramSigma])
+paramSigmaDet=np.array([det(i) for i in paramSigma])
+prior=np.array([[0.25],[0.25],[0.25],[0.25]])
+bestPath=np.zeros((6,1));
+for i in np.arange(O.shape[0]):
+    tmp=(prior*((np.exp(-0.5*np.sum((np.sum((O[i:i+1,:]-paramMean)[:,:,np.newaxis]*
+                                     paramInvSigma,axis=1))*(O[i:i+1,:]-paramMean),axis=1))/(2*(np.pi)*(np.sqrt(paramSigmaDet))))))
+    bestPath[i,0]=np.argmax(tmp)
+    prior=tmp.dot(betaMat)
+
+print(tmp)
+print(bestPath+1)

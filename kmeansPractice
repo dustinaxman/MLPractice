@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar  3 12:05:19 2017
+
+@author: deaxman
+"""
+
+#%%
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import numpy as np
+import pandas as pd
+from numpy.linalg import inv
+from numpy.linalg import det
+#%%
+S=np.array([1,1,1,2,2,3,3,3,2,4,4,4])-1
+X=np.array([[0,0],[-1,0],[0,1],[3,3],[3,4],[7,7],[7,8],[8,7],[2,3],[12,10],[10,10],[11,10]])
+plt.scatter(X[:,0],X[:,1],c=S,cmap='RdBu_r')
+k=4
+centers=X[np.random.choice(X.shape[0],size=(4),replace=False),:]
+for i in np.arange(5):
+    D=np.sum((X[:,:,np.newaxis]-centers[:,:,np.newaxis].T)**2,axis=1)
+    l=np.argmin(D,axis=1)
+    fig=plt.figure()
+    ax=plt.axes()
+    ax.scatter(X[:,0],X[:,1],c=l,cmap='RdBu_r')
+    ax.scatter(centers[:,0],centers[:,1],marker='x')
+    centers=np.array([np.mean(X[l==i,:],axis=0) for i in range(k)])
+
+
+
+#betaMat=np.array([[0.1,0.7,0.1,0.1],[0,0.8,0.1,0.1],[0.25,0.25,0.25,0.25],[0.1,0.8,0.1,0]])
+#paramMean=np.array([[0,0],[3,3],[10,10],[7,6]])
+#paramSigma=np.array([[[1,0],[0,1]],[[1,.5],[.5,1]],[[2,0],[0,1]],[[1,.2],[.2,1.5]]])
+#paramInvSigma=np.array([inv(i) for i in paramSigma])
+#paramSigmaDet=np.array([det(i) for i in paramSigma])
+#prior=np.array([[0.25],[0.25],[0.25],[0.25]])
+#bestPath=np.zeros((6,1));
+#for i in np.arange(O.shape[0]):
+#    tmp=(prior*((np.exp(-0.5*np.sum((np.sum((O[i:i+1,:]-paramMean)[:,:,np.newaxis]*
+#                                     paramInvSigma,axis=1))*(O[i:i+1,:]-paramMean),axis=1))/(2*(np.pi)*(np.sqrt(paramSigmaDet))))))
+#    bestPath[i,0]=np.argmax(tmp)
+#    prior=tmp.dot(betaMat)
+#
+#print(tmp)
+#print(bestPath+1)
